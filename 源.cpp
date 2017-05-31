@@ -12,7 +12,7 @@ int main() {
 	for (;;)
 	{
 		cout << endl << endl;
-		cout << "Operation lists:\n";
+		cout << "***************************************************************************\nThe operation lists:\n";
 		cout << "1. Build a suffix automaton.\n";
 		cout << "2. Insert a symbol to the suffix automaton\n";
 		cout << "3. Verify if an particular string is the suffix of the text context.\n";
@@ -21,7 +21,7 @@ int main() {
 		cout << "6. Find the first position of a substring.\n";
 		cout << "7. Get the occur times of an particular string.\n";
 		cout << "8. Clean the SAM.\n";
-		cout << "q. quit.\n";
+		cout << "q. quit.\n***************************************************************************\n";
 		cout << "Enter your choice: ";
 		cin >> choice;
 		if (choice == 'q')
