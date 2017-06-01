@@ -19,8 +19,8 @@ int main() {
 		cout << "4. Verify if an particular string is the substring of the text context.\n";
 		cout << "5. Count the unique substring of the text context.\n";
 		cout << "6. Find the first position of a substring.\n";
-		cout << "7. Get the occur times of an particular string.\n";
-		cout << "8. Clean the SAM.\n";
+		/*cout << "7. Get the occur times of an particular string.\n";*/
+		cout << "7. Clean the SAM.\n";
 		cout << "q. quit.\n***************************************************************************\n";
 		cout << "Enter your choice: ";
 		cin >> choice;
@@ -66,15 +66,15 @@ int main() {
 				cout << "The fisrt position of the substring is: " << num << endl;
 			else cout << "Not a substring.\n";
 		}
-		else if (choice == '7') {
+		/*else if (choice == '7') {
 			cout << "Please input the string:";
 			cin >> S;
 			num = sam.get_occured_times(S);
 			if (num != -1)
 				cout << "The substring occur times is: " << num << endl;
 			else cout << "Not a substring.\n";
-		}
-		else if (choice == '8') {
+		}*/
+		else if (choice == '7') {
 			sam.clear();
 			cout << "SAM clear.\n";
 		}

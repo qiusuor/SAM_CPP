@@ -32,7 +32,6 @@ public:
 		DEFINE_ACCESSOR_AND_MUTATOR(TransType, trans)
 		DEFINE_ACCESSOR_AND_MUTATOR(bool, visited)
 		DEFINE_ACCESSOR_AND_MUTATOR(int, path_num)
-		DEFINE_ACCESSOR_AND_MUTATOR(int, link_path_num)
 
 		bool has_trans(char c) const {
 		return trans_.count(c) > 0;
@@ -49,7 +48,6 @@ public:
 	}
 private:
 	int path_num_=1;//路径数
-	int link_path_num_ = 1;
 	int maxlen_ = 0;
 	int minlen_ = 0;
 	int first_endpos_ = -1;
@@ -98,9 +96,8 @@ public:
 	void verify_substring(const string&S);
 	int get_unique_substring_num();
 	void path_count_help(State* begin);
-	void link_path_count_help(State* begin);
 	State* get_last() { return last; }
-	int get_occured_times(const string&s);
+	//int get_occured_times(const string&s);
 	int get_first_position(const string&S);
 private:
 	State *start = nullptr;
@@ -237,7 +234,6 @@ int SAM::get_unique_substring_num() {
 	while (vec.size()) {
 		cur = vec[vec.size() - 1];
 		cur->set_visited(true);
-		cur->set_path_num(1);
 		nodes.insert(cur);
 		vec.pop_back();
 		for (auto it : (cur->trans()))
@@ -247,13 +243,10 @@ int SAM::get_unique_substring_num() {
 	for (auto it : nodes)
 		it->set_visited(false);
 	map<State*, State*> map_from_asm_copy;
-	vector<State*> nodes_with_no_outgoing_edge;
 	for (auto it : nodes) {
 		State* copy = new State;
 		map_from_asm_copy[it] = copy;
-		if (!((it->trans()).size()))
-			nodes_with_no_outgoing_edge.push_back(map_from_asm_copy[it]);
-	}//建立映射关系并保存出度为0的边
+	}//建立映射关系
 	map<State*,char> from_start;
 	for (auto it : nodes) {
 		for (auto i : it->trans()) {
@@ -262,8 +255,7 @@ int SAM::get_unique_substring_num() {
 			(map_from_asm_copy[i.second])->set_trans(from_start[map_from_asm_copy[i.second]]++, map_from_asm_copy[it]);
 		}
 	}
-	for (size_t i = 0; i < nodes_with_no_outgoing_edge.size(); i++)
-		path_count_help(nodes_with_no_outgoing_edge[i]);
+	path_count_help(map_from_asm_copy[last]);
 	return (map_from_asm_copy[start])->path_num()-1;
 }
 void SAM::clear() {
@@ -313,60 +305,67 @@ int SAM::get_first_position(const string&S) {
 	
 	return cur->first_endpos();
 }
-int SAM::get_occured_times(const string&S) {
-	if (!start)
-	{
-		cout << "Empty SAM.\n";
-		return -1;
-	}
-	auto cur = start;
-	for (size_t i = 0; i < S.size(); i++)
-	{
-		if (cur->has_trans(S[i]))
-			cur = cur->trans(S[i]);
-		else
-		{
-			cout << "Not a substring!\n";
-			return -1;
-		}
-	}
-	set<State*> nodes;//收集图中所有节点的直接地址
-
-	
-	State* source = cur;
-	vector<State*> vec;//待访问的序列，组织为堆栈
-
-	vec.push_back(start);
-
-	vector<State*> nodes_with_no_outgoing_edge;
-	map<State*, int> link_num;
-	while (vec.size()) {
-		cur = vec[vec.size() - 1];
-		cur->set_visited(true);
-		cur->set_link_path_num(1);
-		nodes.insert(cur);
-		if (cur->link() != nullptr)
-			if (!link_num.count(cur->link()))
-				link_num[cur->link()] = 1;
-			else link_num[cur->link()] += 1;
-		vec.pop_back();
-		for (auto it : (cur->trans()))
-			if (!((it.second)->visited()))
-				vec.push_back(it.second);
-	}
-	for (auto it : nodes) {
-		it->set_visited(false);
-		if (!link_num.count(it))
-			nodes_with_no_outgoing_edge.push_back(it);
-	}
-
-	for (size_t i = 0; i < nodes_with_no_outgoing_edge.size(); i++)
-		link_path_count_help(nodes_with_no_outgoing_edge[i]);
-	return (source)->link_path_num();
-}
-void SAM::link_path_count_help(State* begin) {
-	while (begin->link()) {
-		(begin->link())->set_link_path_num(begin->link_path_num() + 1);
-		begin = begin->link();
-	}
-}
+//int SAM::get_occured_times(const string&S) {
+//	if (!start)
+//	{
+//		cout << "Empty SAM.\n";
+//		return -1;
+//	}
+//	auto cur = start;
+//	for (size_t i = 0; i < S.size(); i++)
+//	{
+//		if (cur->has_trans(S[i]))
+//			cur = cur->trans(S[i]);
+//		else
+//		{
+//			cout << "Not a substring.\n";
+//			return -1;
+//		}
+//	}
+//	State*source = cur;
+//	set<State*> nodes;//收集图中所有节点的直接地址
+//	cur = start;
+//	vector<State*> vec;//待访问的序列，组织为堆栈
+//
+//	vec.push_back(cur);
+//
+//
+//	while (vec.size()) {
+//		cur = vec[vec.size() - 1];
+//		cur->set_visited(true);
+//		nodes.insert(cur);
+//		vec.pop_back();
+//		for (auto it : (cur->trans()))
+//			if (!((it.second)->visited()))
+//				vec.push_back(it.second);
+//	}
+//	for (auto it : nodes)
+//		it->set_visited(false);
+//	map<State*, int> link_num;
+//	for (auto it : nodes) {
+//		link_num[it->link()]=0;
+//	}
+//	for (auto it : nodes) {
+//		if (it->link())
+//			link_num[it->link()] += 1;
+//	}
+//	for (auto i : nodes) {
+//		if (link_num[i]==0)
+//		{
+//			cout << "dsa";
+//			State*te = i;
+//			while (te) {
+//				if (te->link())
+//					(te->link())->set_path_num((te->link())->path_num() + te->path_num());
+//				te = te->link();
+//			}
+//		}
+//	}
+//	int num = 0;
+//	if (link_num[source]<=1)
+//		num= source->path_num();
+//	else num= source->path_num()-1;
+//	for (auto i : nodes)
+//		i->set_path_num(1);
+//	return num;
+//}
